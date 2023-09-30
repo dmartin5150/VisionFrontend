@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import ListItem from './components/ListItems/ListItem';
 import PatientInfo from './components/patientInfo/patientInfo';
@@ -12,12 +12,22 @@ const items = [
 
 const patient = {'name':'Seamless Apple', 'MRN':'1111111', 'FIN':'00000000'}
 
+const noPatientID = {
+  'MRN':'',
+  'FIN':''
+}
 
 function App() {
-
+  const [patientID, setPatientID] = useState<PatientID>(noPatientID)
 
   const handleRefreshData = () => {
-    console.log(getMRNFIN())
+    async function getPatientID() {
+      const patId = await getMRNFIN()
+      setPatientID(patId)
+      console.log(patId)
+    }
+    getPatientID()
+
   }
 
   return (
@@ -25,7 +35,7 @@ function App() {
       <div className='document-table'>
         <div className='document-header'>
           <div className='document-patient'>
-            <PatientInfo patient={patient} />
+            <PatientInfo patientName='' patientID={patientID} />
           </div>
           <div className='refresh-button'>
             <button onClick={handleRefreshData}>Refresh Data</button>

@@ -19,11 +19,18 @@ const noPatientID = {
 
 function App() {
   const [patientID, setPatientID] = useState<PatientID>(noPatientID)
+  const [patientFound, setPatientFound] = useState(false)
+
 
   const handleRefreshData = () => {
     async function getPatientID() {
       const patId = await getMRNFIN()
       setPatientID(patId)
+      if (patId.MRN !== '' ) {
+        setPatientFound(true)
+      } else {
+        setPatientFound(false)
+      }
       console.log(patId)
     }
     getPatientID()
@@ -34,24 +41,27 @@ function App() {
     <div className="App">
       <div className='document-table'>
         <div className='document-header'>
-          <div className='document-patient'>
+          {patientFound ? 
+            <div className='document-patient'>
             <PatientInfo patientName='' patientID={patientID} />
-          </div>
+          </div> :
+            <div className='document-patient'> Patient Not Found</div>
+          }
           <div className='refresh-button'>
             <button onClick={handleRefreshData}>Refresh Data</button>
-          </div>
+          </div> 
         </div>
-        <div className='document-items'>
+        {!patientFound && <div className='document-items'>
             <div className='document-items--name'>Document</div>
             <div className='document-items--status'>Status</div>
-        </div> 
-        <ul className='document-list'>
+        </div> }
+        {patientFound && <ul className='document-list'>
           {items.map((item, idx) => 
               <li key={idx}>
                 <ListItem item={item} />
               </li>
           )}
-        </ul>
+        </ul>}
       </div>
     </div>
   );

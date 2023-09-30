@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import './App.css';
 import ListItem from './components/ListItems/ListItem';
 import PatientInfo from './components/patientInfo/patientInfo';
@@ -20,6 +20,21 @@ const noPatientID = {
 function App() {
   const [patientID, setPatientID] = useState<PatientID>(noPatientID)
   const [patientFound, setPatientFound] = useState(false)
+
+  async function getPatientID() {
+    const patId = await getMRNFIN()
+    setPatientID(patId)
+    if (patId.MRN !== '' ) {
+      setPatientFound(true)
+    } else {
+      setPatientFound(false)
+    }
+    console.log(patId)
+  }
+
+  useEffect(() => {
+    setTimeout(() => getPatientID(), 2000);
+  },[patientID])
 
 
   const handleRefreshData = () => {

@@ -2,6 +2,8 @@ import React from 'react';
 import './App.css';
 import ListItem from './components/ListItems/ListItem';
 import PatientInfo from './components/patientInfo/patientInfo';
+import getMRNFIN from './utilities/fetchdata/getBlockData';
+import { PatientID } from './components/patientInfo/patientInfo';
 
 const items = [
   {'name': 'falls','status': 'complete'},
@@ -10,7 +12,14 @@ const items = [
 
 const patient = {'name':'Seamless Apple', 'MRN':'1111111', 'FIN':'00000000'}
 
+
 function App() {
+
+
+  const handleRefreshData = () => {
+    console.log(getMRNFIN())
+  }
+
   return (
     <div className="App">
       <div className='document-table'>
@@ -19,7 +28,7 @@ function App() {
             <PatientInfo patient={patient} />
           </div>
           <div className='refresh-button'>
-            <button>Refresh Data</button>
+            <button onClick={handleRefreshData}>Refresh Data</button>
           </div>
         </div>
         <div className='document-items'>

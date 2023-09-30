@@ -9,6 +9,10 @@ interface PatientInfoProps {
     };
 }
 
+export type PatientID = {
+    MRN:string,
+    FIN:string
+}
 
 const PatientInfo: React.FC<PatientInfoProps> = ({patient}) => {
     const {name,FIN, MRN } = patient

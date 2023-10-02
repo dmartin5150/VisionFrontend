@@ -3,11 +3,12 @@ import './App.css';
 import ListItem from './components/ListItems/ListItem';
 import PatientInfo from './components/patientInfo/patientInfo';
 import getMRNFIN from './utilities/fetchdata/getBlockData';
+import getPatientName from './utilities/fetchdata/getPatientName';
 import { PatientID } from './components/patientInfo/patientInfo';
 
 const items = [
   {'name': 'falls','status': 'complete'},
-  {'name':'sitter', 'status': 'incomplete'}
+  {'name':'Isolation Precautions', 'status': 'incomplete'}
 ]
 
 const patient = {'name':'Seamless Apple', 'MRN':'1111111', 'FIN':'00000000'}
@@ -22,8 +23,13 @@ function App() {
   const [patientFound, setPatientFound] = useState(false)
 
   async function getPatientID() {
-    const patId = await getMRNFIN()
-    setPatientID(patId)
+    const patId= await getMRNFIN()
+    if (patId !== patientID) {
+      setPatientID(patId)
+      const patientName = await getPatientName(patId.FIN)
+      console.log(patientName)
+    }
+
     if (patId.MRN !== '' ) {
       setPatientFound(true)
     } else {

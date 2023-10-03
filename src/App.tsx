@@ -4,6 +4,7 @@ import ListItem from './components/ListItems/ListItem';
 import PatientInfo from './components/patientInfo/patientInfo';
 import getMRNFIN from './utilities/fetchdata/getBlockData';
 import getPatientName from './utilities/fetchdata/getPatientName';
+import getDocInfo from './utilities/fetchdata/getDocInfo';
 import { PatientID } from './components/patientInfo/patientInfo';
 
 const items = [
@@ -18,9 +19,31 @@ const noPatientID = {
   'FIN':''
 }
 
+type Patient = {
+  name:string;
+  id: PatientID
+}
+
+const noPatient:Patient = {
+  name:'',
+  id:noPatientID
+}
+
+
+export type DocInfo = {
+  docType:string;
+  docStatus:string;
+}
+
+export const noDocInfo:DocInfo[] = [{docType:'',docStatus:''}]
+
+
+
 function App() {
   const [patientID, setPatientID] = useState<PatientID>(noPatientID)
   const [patientFound, setPatientFound] = useState(false)
+  const [patient, setPatient] = useState<Patient>(noPatient)
+  const [docStats, setDocStats] = useState<DocInfo[]>(noDocInfo)
 
   async function getPatientID() {
     const patId= await getMRNFIN()
@@ -28,6 +51,16 @@ function App() {
       setPatientID(patId)
       const patientName = await getPatientName(patId.FIN)
       console.log(patientName)
+      if (patientName === '') {
+        setPatient(noPatient)
+        setDocStats(noDocInfo)
+        return 
+      } else if (patientName !== patient.name){
+        const curPatient:Patient = {name:patientName, id:patId}
+        const curDocInfo = await getDocInfo(patId.FIN)
+        setPatient(curPatient)
+        setDocStats(curDocInfo)
+      }
     }
 
     if (patId.MRN !== '' ) {
@@ -44,17 +77,14 @@ function App() {
 
 
   const handleRefreshData = () => {
-    async function getPatientID() {
-      const patId = await getMRNFIN()
-      setPatientID(patId)
-      if (patId.MRN !== '' ) {
-        setPatientFound(true)
-      } else {
-        setPatientFound(false)
+    async function getPatientDocInfo() {
+
+      if (patient.name !== ''){
+        const docInfo = await getDocInfo(patient.id.FIN)
+        setDocStats(docInfo)
       }
-      console.log(patId)
     }
-    getPatientID()
+    getPatientDocInfo()
 
   }
 
@@ -64,7 +94,7 @@ function App() {
         <div className='document-header'>
           {patientFound ? 
             <div className='document-patient'>
-            <PatientInfo patientName='' patientID={patientID} />
+            <PatientInfo patientName={patient.name} patientID={patient.id} />
           </div> :
             <div className='document-patient'> Patient Not Found</div>
           }
@@ -77,9 +107,9 @@ function App() {
             <div className='document-items--status'>Status</div>
         </div> }
         {patientFound && <ul className='document-list'>
-          {items.map((item, idx) => 
+          {docStats.map((item, idx) => 
               <li key={idx}>
-                <ListItem item={item} />
+                <ListItem docInfo={item} />
               </li>
           )}
         </ul>}
